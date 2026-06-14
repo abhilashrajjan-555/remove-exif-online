@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "wrangler pages deploy dist --project-name remove-exif-online"
+    "deploy": "npx wrangler pages deploy dist --project-name remove-exif-online"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.3.1",
