@@ -1,0 +1,59 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = "Terms of Service - EXIF Metadata Stripper";
+const description = "Read the Terms of Service for using our free online client-side EXIF metadata stripping utility.";
+---
+
+<Layout title={title} description={description}>
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <div class="space-y-8">
+      <div class="space-y-4">
+        <h1 class="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-4xl">
+          Terms of Service
+        </h1>
+        <p class="text-xs text-neutral-400">
+          Last updated: June 14, 2026
+        </p>
+      </div>
+
+      <div class="prose prose-neutral dark:prose-invert text-sm sm:text-base text-neutral-600 dark:text-neutral-450 space-y-6 leading-relaxed">
+        <p>
+          By accessing and using the EXIF Metadata Stripper website, you agree to comply with and be bound by the following terms and conditions. If you do not agree, please do not use our service.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">1. Description of Service</h2>
+        <p>
+          EXIF Metadata Stripper is a web utility designed to inspect and remove metadata (including EXIF, GPS, XMP, IPTC, and text chunks) from supported image files (JPEG, PNG, WebP) directly within your web browser. The service is provided 100% free of charge.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">2. Use License & Local Execution</h2>
+        <p>
+          You are granted permission to use the software and scripts on this site for personal and commercial purposes. Because execution happens entirely on your local machine:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 mt-3">
+          <li>You retain full ownership, responsibility, and control over all images processed.</li>
+          <li>You must not use this tool to intentionally corrupt files, distribute malicious content, or interfere with the website's frontend scripts.</li>
+        </ul>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">3. Disclaimer</h2>
+        <p>
+          The materials and services on this website are provided on an 'as is' basis. EXIF Metadata Stripper makes no warranties, expressed or implied, and hereby disclaims all other warranties including, without limitation, implied warranties of merchantability, fitness for a particular purpose, or non-infringement of intellectual property.
+        </p>
+        <p>
+          Further, we do not warrant that the metadata removal is 100% complete for all proprietary or undocumented file formats. We recommend verifying the outputs for sensitive use-cases.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">4. Limitations of Liability</h2>
+        <p>
+          In no event shall EXIF Metadata Stripper or its developers be liable for any damages (including, without limitation, damages for loss of data, image corruption, or profit loss) arising out of the use or inability to use the services on this website, even if notified of the possibility of such damage.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">5. Governing Law</h2>
+        <p>
+          These terms and conditions are governed by and construed in accordance with local regulations, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

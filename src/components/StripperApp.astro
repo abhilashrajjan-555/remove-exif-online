@@ -1,0 +1,668 @@
+---
+// src/components/StripperApp.astro
+---
+
+<div class="w-full max-w-6xl mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left/Middle Panel: Upload and File List (2 cols on large screens) -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Drag & Drop Area -->
+      <div 
+        id="drop-zone"
+        class="relative border-2 border-dashed border-neutral-300 dark:border-neutral-800 rounded-2xl p-10 text-center bg-white dark:bg-neutral-950 transition-all cursor-pointer hover:border-neutral-400 dark:hover:border-neutral-700 group flex flex-col items-center justify-center min-h-[260px]"
+      >
+        <input 
+          type="file" 
+          id="file-input" 
+          class="hidden" 
+          multiple 
+          accept="image/jpeg,image/png,image/webp" 
+        />
+        
+        <div class="p-4 rounded-full bg-neutral-50 dark:bg-neutral-900 group-hover:scale-105 transition-transform duration-200 border border-neutral-100 dark:border-neutral-850">
+          <svg class="h-10 w-10 text-neutral-500 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        
+        <h3 class="mt-4 text-base font-semibold text-neutral-800 dark:text-neutral-200">
+          Drag & drop your images here
+        </h3>
+        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400 max-w-xs">
+          Supports JPEG, PNG, and WebP. Processing is 100% local inside your browser.
+        </p>
+        <button 
+          type="button" 
+          class="mt-4 px-4 py-2 text-xs font-semibold rounded-lg bg-neutral-900 hover:bg-neutral-850 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 transition-colors shadow-xs"
+        >
+          Browse Files
+        </button>
+      </div>
+
+      <!-- Action & Global controls -->
+      <div id="bulk-actions" class="hidden flex items-center justify-between p-4 rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <div class="flex items-center gap-2 text-xs text-neutral-550 dark:text-neutral-400">
+          <span id="file-count-badge" class="font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-905 text-neutral-800 dark:text-neutral-200">0</span>
+          <span>files selected</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button 
+            id="clear-all-btn" 
+            class="px-3 py-1.5 text-xs font-medium rounded-lg text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+          >
+            Clear All
+          </button>
+          <button 
+            id="strip-all-btn" 
+            class="px-4 py-1.5 text-xs font-semibold rounded-lg text-white bg-red-650 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 transition-colors shadow-xs flex items-center gap-1.5"
+          >
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span>Strip All Metadata</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- File List -->
+      <div id="file-list" class="space-y-3">
+        <!-- Rendered dynamically -->
+      </div>
+      
+      <!-- Stats Board (hidden initially) -->
+      <div id="stats-board" class="hidden p-5 rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 space-y-4">
+        <h4 class="text-sm font-semibold text-neutral-850 dark:text-neutral-100">Stripping Session Summary</h4>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50">
+            <div id="stat-cleaned" class="text-lg font-bold text-neutral-900 dark:text-neutral-100">0</div>
+            <div class="text-[10px] uppercase tracking-wider text-neutral-500">Cleaned</div>
+          </div>
+          <div class="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50">
+            <div id="stat-saved" class="text-lg font-bold text-green-650 dark:text-green-500">0 KB</div>
+            <div class="text-[10px] uppercase tracking-wider text-neutral-500">Data Saved</div>
+          </div>
+          <div class="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50">
+            <div id="stat-privacy" class="text-lg font-bold text-blue-600 dark:text-blue-400">100%</div>
+            <div class="text-[10px] uppercase tracking-wider text-neutral-500">Privacy Score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Panel: Metadata Inspector / Sidebar -->
+    <div class="space-y-6">
+      <div class="border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-950 p-6 sticky top-24 min-h-[400px] flex flex-col">
+        <h3 class="text-sm font-bold tracking-tight uppercase text-neutral-400 dark:text-neutral-500 mb-4">
+          Metadata Inspector
+        </h3>
+        
+        <!-- Empty State -->
+        <div id="inspector-empty" class="flex-grow flex flex-col items-center justify-center text-center p-6 space-y-2">
+          <svg class="h-8 w-8 text-neutral-350 dark:text-neutral-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <p class="text-xs font-medium text-neutral-600 dark:text-neutral-400">No image selected</p>
+          <p class="text-[10px] text-neutral-400 max-w-[180px]">Select a file from the list to inspect its hidden metadata and GPS coordinates.</p>
+        </div>
+
+        <!-- Inspector Content (hidden by default) -->
+        <div id="inspector-content" class="hidden flex-grow flex flex-col space-y-5">
+          <div>
+            <h4 id="inspect-filename" class="text-sm font-semibold truncate text-neutral-900 dark:text-neutral-100">Image.jpg</h4>
+            <p id="inspect-filesize" class="text-[10px] text-neutral-400">1.2 MB</p>
+          </div>
+
+          <!-- GPS Map Container -->
+          <div id="gps-map-section" class="hidden space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Photo Location</span>
+              <span id="gps-coords-badge" class="text-[10px] text-neutral-400">40.7128, -74.0060</span>
+            </div>
+            <div 
+              id="metadata-map" 
+              class="h-44 w-full rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 z-10"
+            ></div>
+            <p class="text-[10px] text-neutral-400 leading-normal">
+              ⚠️ **Security Risk:** This image contains GPS metadata. Anyone who downloads it can see exactly where it was captured.
+            </p>
+          </div>
+
+          <!-- Tag List -->
+          <div class="space-y-2 flex-grow">
+            <span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">Found Tags</span>
+            <div id="inspect-tag-list" class="divide-y divide-neutral-100 dark:divide-neutral-900 text-xs border border-neutral-100 dark:border-neutral-900 rounded-lg overflow-hidden bg-neutral-50/50 dark:bg-neutral-950">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  import { parseMetadata, stripImageMetadata } from '../utils/stripper';
+
+  interface FileItem {
+    id: string;
+    file: File;
+    status: 'idle' | 'parsing' | 'ready' | 'stripping' | 'done';
+    hasMetadata: boolean;
+    metadata: any;
+    sizeSaved: number;
+    cleanedBlobUrl?: string;
+  }
+
+  let filesList: FileItem[] = [];
+  let selectedFileId: string | null = null;
+  let mapInstance: any = null;
+
+  // DOM elements
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const fileListContainer = document.getElementById('file-list');
+  const bulkActions = document.getElementById('bulk-actions');
+  const fileCountBadge = document.getElementById('file-count-badge');
+  const clearAllBtn = document.getElementById('clear-all-btn');
+  const stripAllBtn = document.getElementById('strip-all-btn');
+  
+  const statsBoard = document.getElementById('stats-board');
+  const statCleaned = document.getElementById('stat-cleaned');
+  const statSaved = document.getElementById('stat-saved');
+
+  const inspectorEmpty = document.getElementById('inspector-empty');
+  const inspectorContent = document.getElementById('inspector-content');
+  const inspectFilename = document.getElementById('inspect-filename');
+  const inspectFilesize = document.getElementById('inspect-filesize');
+  const gpsMapSection = document.getElementById('gps-map-section');
+  const gpsCoordsBadge = document.getElementById('gps-coords-badge');
+  const inspectTagList = document.getElementById('inspect-tag-list');
+
+  // Trigger file browsing
+  dropZone?.addEventListener('click', (e) => {
+    // Avoid triggering when clicking the browse button inside (it bubbles)
+    if (e.target === dropZone || (e.target as HTMLElement).closest('button')) {
+      fileInput?.click();
+    }
+  });
+
+  fileInput?.addEventListener('change', () => {
+    if (fileInput.files) {
+      handleFiles(Array.from(fileInput.files));
+    }
+    fileInput.value = ''; // Reset to allow same file uploading
+  });
+
+  // Drag & drop handlers
+  dropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-neutral-500', 'bg-neutral-50/50', 'dark:bg-neutral-900/50');
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, () => {
+      dropZone.classList.remove('border-neutral-500', 'bg-neutral-50/50', 'dark:bg-neutral-900/50');
+    });
+  });
+
+  dropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer?.files) {
+      handleFiles(Array.from(e.dataTransfer.files));
+    }
+  });
+
+  // Process files
+  async function handleFiles(files: File[]) {
+    const validFiles = files.filter(file => {
+      const type = file.type || '';
+      const name = file.name.toLowerCase();
+      return type.startsWith('image/') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp');
+    });
+
+    if (validFiles.length === 0) return;
+
+    // Show actions panel
+    bulkActions?.classList.remove('hidden');
+
+    for (const file of validFiles) {
+      const id = Math.random().toString(36).substring(2, 9);
+      const fileItem: FileItem = {
+        id,
+        file,
+        status: 'parsing',
+        hasMetadata: false,
+        metadata: null,
+        sizeSaved: 0,
+      };
+
+      filesList.push(fileItem);
+      renderFileList();
+
+      // Async parse
+      parseFileMetadata(fileItem);
+    }
+
+    updateControlsState();
+  }
+
+  async function parseFileMetadata(item: FileItem) {
+    try {
+      const metadata = await parseMetadata(item.file);
+      item.metadata = metadata;
+      item.hasMetadata = metadata.hasMetadata;
+      item.status = 'ready';
+    } catch (e) {
+      console.error(e);
+      item.status = 'ready';
+    }
+
+    renderFileList();
+    
+    // Auto select first file if nothing selected
+    if (!selectedFileId) {
+      selectFile(item.id);
+    }
+  }
+
+  // Render the file list
+  function renderFileList() {
+    if (!fileListContainer) return;
+    fileListContainer.innerHTML = '';
+
+    if (filesList.length === 0) {
+      bulkActions?.classList.add('hidden');
+      statsBoard?.classList.add('hidden');
+      deselectAll();
+      return;
+    }
+
+    filesList.forEach(item => {
+      const isSelected = item.id === selectedFileId;
+      const fileEl = document.createElement('div');
+      fileEl.className = `flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+        isSelected
+          ? 'border-neutral-900 bg-neutral-50 dark:border-neutral-100 dark:bg-neutral-900'
+          : 'border-neutral-200 bg-white hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-neutral-700'
+      }`;
+      fileEl.dataset.id = item.id;
+
+      // Thumbnail generation helper
+      const sizeStr = formatBytes(item.file.size);
+      
+      // Status message
+      let statusHtml = '';
+      if (item.status === 'parsing') {
+        statusHtml = `<span class="text-[10px] text-neutral-450 dark:text-neutral-500 animate-pulse flex items-center gap-1">
+          <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg> Analyzing...
+        </span>`;
+      } else if (item.status === 'ready') {
+        if (item.hasMetadata) {
+          const badgeColor = item.metadata?.gps ? 'bg-red-50 text-red-700 dark:bg-red-950/35 dark:text-red-400' : 'bg-amber-50 text-amber-700 dark:bg-amber-955/35 dark:text-amber-400';
+          const badgeText = item.metadata?.gps ? 'GPS + EXIF' : 'Contains Tags';
+          statusHtml = `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${badgeColor}">${badgeText}</span>`;
+        } else {
+          statusHtml = `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700 dark:bg-green-950/35 dark:text-green-400">Clean (No EXIF)</span>`;
+        }
+      } else if (item.status === 'stripping') {
+        statusHtml = `<span class="text-[10px] text-red-500 animate-pulse">Stripping...</span>`;
+      } else if (item.status === 'done') {
+        const savedStr = item.sizeSaved > 0 ? `Saved ${formatBytes(item.sizeSaved)}` : 'Surgical cleaning';
+        statusHtml = `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1">
+          <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          ${savedStr}
+        </span>`;
+      }
+
+      fileEl.innerHTML = `
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <!-- File Preview -->
+          <div class="h-10 w-10 rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-900 flex-shrink-0 flex items-center justify-center border border-neutral-200/50 dark:border-neutral-800/50">
+            <img id="thumb-${item.id}" class="h-full w-full object-cover hidden" alt="" />
+            <svg id="icon-${item.id}" class="h-5 w-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <!-- Details -->
+          <div class="min-w-0 flex-grow pr-2">
+            <h4 class="text-xs font-semibold text-neutral-800 dark:text-neutral-250 truncate max-w-[180px] sm:max-w-[280px]">
+              ${item.file.name}
+            </h4>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-[10px] text-neutral-400">${sizeStr}</span>
+              ${statusHtml}
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2 mt-3 sm:mt-0 w-full sm:w-auto justify-end">
+          ${item.status === 'ready' && item.hasMetadata ? `
+            <button 
+              type="button" 
+              class="strip-single-btn px-2.5 py-1 text-[11px] font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 rounded-md transition-colors"
+              data-id="${item.id}"
+            >
+              Strip
+            </button>
+          ` : ''}
+          ${item.status === 'done' ? `
+            <a 
+              href="${item.cleanedBlobUrl}" 
+              download="clean-${item.file.name}"
+              class="px-2.5 py-1 text-[11px] font-semibold bg-neutral-900 text-white hover:bg-neutral-850 dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 rounded-md transition-colors shadow-xs flex items-center gap-1"
+              data-id="${item.id}"
+            >
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download
+            </a>
+          ` : ''}
+          <button 
+            type="button" 
+            class="delete-btn p-1 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 rounded-md"
+            data-id="${item.id}"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      `;
+
+      // Set thumbnail src in background
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = fileEl.querySelector(`#thumb-${item.id}`) as HTMLImageElement;
+        const icon = fileEl.querySelector(`#icon-${item.id}`) as SVGElement;
+        if (img && icon && e.target?.result) {
+          img.src = e.target.result as string;
+          img.classList.remove('hidden');
+          icon.classList.add('hidden');
+        }
+      };
+      reader.readAsDataURL(item.file);
+
+      // Add to container
+      fileListContainer.appendChild(fileEl);
+    });
+
+    updateControlsState();
+  }
+
+  // Handle clicking inside file list
+  fileListContainer?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+
+    // Check if clicked delete
+    const deleteBtn = target.closest('.delete-btn');
+    if (deleteBtn) {
+      e.stopPropagation();
+      const id = deleteBtn.getAttribute('data-id') || '';
+      removeFile(id);
+      return;
+    }
+
+    // Check if clicked single strip
+    const stripBtn = target.closest('.strip-single-btn');
+    if (stripBtn) {
+      e.stopPropagation();
+      const id = stripBtn.getAttribute('data-id') || '';
+      stripSingleFile(id);
+      return;
+    }
+
+    // Clicked file card
+    const fileCard = target.closest('[data-id]');
+    if (fileCard) {
+      const id = fileCard.getAttribute('data-id') || '';
+      selectFile(id);
+    }
+  });
+
+  // Strip a single file
+  async function stripSingleFile(id: string) {
+    const item = filesList.find(f => f.id === id);
+    if (!item || item.status !== 'ready') return;
+
+    item.status = 'stripping';
+    renderFileList();
+
+    try {
+      const result = await stripImageMetadata(item.file);
+      item.sizeSaved = result.sizeSaved;
+      item.status = 'done';
+      
+      // Revoke old blob URL if it exists
+      if (item.cleanedBlobUrl) {
+        URL.revokeObjectURL(item.cleanedBlobUrl);
+      }
+      item.cleanedBlobUrl = URL.createObjectURL(result.blob);
+    } catch (e) {
+      console.error(e);
+      item.status = 'ready';
+    }
+
+    renderFileList();
+    updateStatsBoard();
+    if (selectedFileId === id) {
+      selectFile(id); // Refresh inspector
+    }
+  }
+
+  // Strip all files
+  async function stripAllFiles() {
+    const readyItems = filesList.filter(f => f.status === 'ready' && f.hasMetadata);
+    if (readyItems.length === 0) return;
+
+    for (const item of readyItems) {
+      await stripSingleFile(item.id);
+    }
+  }
+
+  // Remove file
+  function removeFile(id: string) {
+    const index = filesList.findIndex(f => f.id === id);
+    if (index === -1) return;
+
+    const item = filesList[index];
+    if (item.cleanedBlobUrl) {
+      URL.revokeObjectURL(item.cleanedBlobUrl);
+    }
+
+    filesList.splice(index, 1);
+
+    if (selectedFileId === id) {
+      if (filesList.length > 0) {
+        selectFile(filesList[0].id);
+      } else {
+        deselectAll();
+      }
+    }
+
+    renderFileList();
+    updateStatsBoard();
+  }
+
+  // Select a file
+  function selectFile(id: string) {
+    selectedFileId = id;
+    
+    // Highlight selected card visually
+    const cards = fileListContainer?.querySelectorAll('[data-id]');
+    cards?.forEach(card => {
+      const cardId = card.getAttribute('data-id');
+      if (cardId === id) {
+        card.classList.add('border-neutral-900', 'bg-neutral-50', 'dark:border-neutral-100', 'dark:bg-neutral-900');
+        card.classList.remove('border-neutral-200', 'bg-white', 'dark:border-neutral-800', 'dark:bg-neutral-950');
+      } else {
+        card.classList.remove('border-neutral-900', 'bg-neutral-50', 'dark:border-neutral-100', 'dark:bg-neutral-900');
+        card.classList.add('border-neutral-200', 'bg-white', 'dark:border-neutral-800', 'dark:bg-neutral-950');
+      }
+    });
+
+    // Populate Inspector panel
+    const item = filesList.find(f => f.id === id);
+    if (!item) return;
+
+    inspectorEmpty?.classList.add('hidden');
+    inspectorContent?.classList.remove('hidden');
+
+    if (inspectFilename) inspectFilename.textContent = item.file.name;
+    if (inspectFilesize) inspectFilesize.textContent = formatBytes(item.file.size);
+
+    if (item.status === 'parsing') {
+      if (inspectTagList) {
+        inspectTagList.innerHTML = `<div class="p-4 text-center text-neutral-400">Loading metadata...</div>`;
+      }
+      gpsMapSection?.classList.add('hidden');
+      return;
+    }
+
+    // Render Tag table
+    if (inspectTagList && item.metadata) {
+      inspectTagList.innerHTML = '';
+      
+      const details = item.metadata.details || [];
+      if (details.length === 0) {
+        inspectTagList.innerHTML = `<div class="p-4 text-center text-neutral-450 dark:text-neutral-500">No EXIF tags detected in this image.</div>`;
+      } else {
+        details.forEach((det: any) => {
+          const row = document.createElement('div');
+          row.className = 'flex justify-between px-3 py-2 border-b border-neutral-100/50 dark:border-neutral-900/50 last:border-0';
+          row.innerHTML = `
+            <span class="font-medium text-neutral-500">${det.label}</span>
+            <span class="text-neutral-800 dark:text-neutral-250 text-right select-all max-w-[160px] truncate">${det.value}</span>
+          `;
+          inspectTagList.appendChild(row);
+        });
+      }
+    }
+
+    // Display GPS Map if coordinates found
+    if (item.metadata?.gps && item.status !== 'done') {
+      gpsMapSection?.classList.remove('hidden');
+      if (gpsCoordsBadge) {
+        gpsCoordsBadge.textContent = item.metadata.gps.formatted;
+      }
+      initLeafletMap(item.metadata.gps.latitude, item.metadata.gps.longitude);
+    } else {
+      gpsMapSection?.classList.add('hidden');
+    }
+  }
+
+  // Initialize GPS Map using Leaflet.js (dynamically loaded from CDN)
+  async function initLeafletMap(lat: number, lon: number) {
+    const mapContainer = document.getElementById('metadata-map');
+    if (!mapContainer) return;
+
+    // Load Leaflet dynamically
+    if (!(window as any).L) {
+      await new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        script.crossOrigin = '';
+        script.onload = resolve;
+        document.head.appendChild(script);
+      });
+    }
+
+    const L = (window as any).L;
+
+    // Remove existing instance if initialized
+    if (mapInstance) {
+      mapInstance.remove();
+    }
+
+    // Render Map
+    mapInstance = L.map('metadata-map', {
+      center: [lat, lon],
+      zoom: 13,
+      zoomControl: false,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(mapInstance);
+
+    L.marker([lat, lon]).addTo(mapInstance);
+  }
+
+  function deselectAll() {
+    selectedFileId = null;
+    inspectorContent?.classList.add('hidden');
+    inspectorEmpty?.classList.remove('remove');
+    inspectorEmpty?.classList.add('flex');
+    if (mapInstance) {
+      mapInstance.remove();
+      mapInstance = null;
+    }
+  }
+
+  // Update actions toolbar
+  function updateControlsState() {
+    if (fileCountBadge) {
+      fileCountBadge.textContent = filesList.length.toString();
+    }
+
+    const hasReadyToStrip = filesList.some(f => f.status === 'ready' && f.hasMetadata);
+    if (stripAllBtn) {
+      if (hasReadyToStrip) {
+        (stripAllBtn as HTMLButtonElement).disabled = false;
+        stripAllBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        (stripAllBtn as HTMLButtonElement).disabled = true;
+        stripAllBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+  }
+
+  // Update Statsboard
+  function updateStatsBoard() {
+    const strippedItems = filesList.filter(f => f.status === 'done');
+    if (strippedItems.length > 0) {
+      statsBoard?.classList.remove('hidden');
+      if (statCleaned) statCleaned.textContent = strippedItems.length.toString();
+      
+      const totalSavedBytes = strippedItems.reduce((acc, f) => acc + f.sizeSaved, 0);
+      if (statSaved) statSaved.textContent = formatBytes(totalSavedBytes);
+    } else {
+      statsBoard?.classList.add('hidden');
+    }
+  }
+
+  // Bulk Actions Event Listeners
+  clearAllBtn?.addEventListener('click', () => {
+    // Revoke all Blob URLs
+    filesList.forEach(f => {
+      if (f.cleanedBlobUrl) URL.revokeObjectURL(f.cleanedBlobUrl);
+    });
+    filesList = [];
+    deselectAll();
+    renderFileList();
+    updateStatsBoard();
+  });
+
+  stripAllBtn?.addEventListener('click', () => {
+    stripAllFiles();
+  });
+
+  // Helpers
+  function formatBytes(bytes: number, decimals = 1) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+</script>

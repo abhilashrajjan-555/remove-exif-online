@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = "Privacy Policy - EXIF Metadata Stripper";
+const description = "Our privacy policy states explicitly that zero files are uploaded to our servers. All EXIF metadata removal is performed 100% locally in your browser.";
+---
+
+<Layout title={title} description={description}>
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <div class="space-y-8">
+      <div class="space-y-4">
+        <h1 class="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-4xl">
+          Privacy Policy
+        </h1>
+        <p class="text-xs text-neutral-400">
+          Last updated: June 14, 2026
+        </p>
+      </div>
+
+      <div class="prose prose-neutral dark:prose-invert text-sm sm:text-base text-neutral-600 dark:text-neutral-450 space-y-6 leading-relaxed">
+        <p>
+          At EXIF Metadata Stripper, we are committed to absolute user privacy. Because our tool is designed to sanitize private metadata from your photos, we believe our own privacy standards must be exemplary.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">1. Image Data Security (No Uploads)</h2>
+        <p>
+          <strong>We do not upload, transmit, copy, or store your images on any remote server.</strong> All operations, including EXIF parsing, coordinate mapping, and metadata stripping, are executed 100% locally within your browser using sandboxed Web APIs (FileReader, ArrayBuffer, DataView, and Blobs). Your files never leave your device.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">2. Information We Collect</h2>
+        <p>
+          Since our tool runs entirely client-side, we do not require account registration, email sign-ups, or login sessions. We collect:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 mt-3">
+          <li><strong>Anonymized Site Analytics:</strong> We use lightweight web analytics (such as Google Analytics or self-hosted analytics) to measure general traffic parameters (page views, browser types, country distribution). This data is completely aggregated and does not contain personal indicators or any information about the files you process.</li>
+          <li><strong>Cookies:</strong> If applicable, third-party advertising partners (like Google AdSense) may set cookies to serve personalized advertisements based on your browsing interests. You can disable cookies in your browser settings.</li>
+        </ul>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">3. Third-Party Libraries and Scripts</h2>
+        <p>
+          Our application utilizes the following third-party integrations:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 mt-3">
+          <li><strong>LeafletJS:</strong> Loaded dynamically from a CDN to render coordinates on an interactive map. Leaflet does not collect or transmit your photos.</li>
+          <li><strong>OpenStreetMap:</strong> Map tiles are fetched from OpenStreetMap servers. Your coordinates are sent to fetch the local map imagery, but no personal identification is linked to these queries.</li>
+          <li><strong>Google AdSense:</strong> If advertisements are active, Google uses cookies to serve ads based on your visits to this and other websites on the internet.</li>
+        </ul>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">4. Changes to This Policy</h2>
+        <p>
+          We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated "Last updated" date.
+        </p>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">5. Contact Us</h2>
+        <p>
+          If you have any questions regarding this privacy policy or our local processing architecture, please contact us via our <a href="/contact" class="underline hover:text-neutral-950 dark:hover:text-neutral-50">Contact Page</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

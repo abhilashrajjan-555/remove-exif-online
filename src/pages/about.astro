@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = "About Us - EXIF Metadata Stripper";
+const description = "Learn about our mission to protect your online privacy by removing GPS coordinates and hidden metadata from photos locally in the browser.";
+---
+
+<Layout title={title} description={description}>
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <div class="space-y-8">
+      <div class="space-y-4">
+        <h1 class="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-4xl">
+          About the EXIF Metadata Stripper
+        </h1>
+        <p class="text-base text-neutral-500 dark:text-neutral-400">
+          Our mission is to make online privacy simple, secure, and accessible to everyone.
+        </p>
+      </div>
+
+      <div class="prose prose-neutral dark:prose-invert text-sm sm:text-base text-neutral-600 dark:text-neutral-450 space-y-6 leading-relaxed">
+        <p>
+          We live in an age where sharing photos online is instant. However, digital cameras and smartphones silently log extensive parameters in every file. This metadata, known as EXIF data, often contains the exact GPS coordinates of where you sleep, work, or travel, along with precise timestamps and hardware signatures.
+        </p>
+        
+        <p>
+          Many popular online tools require uploading your private files to remote databases to delete this information. We believe this model compromises user security.
+        </p>
+        
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">The Client-Side Difference</h2>
+        <p>
+          This website was built to prove that advanced image sanitation does not require backend servers or data transfers. Our tool runs **100% inside your local browser sandboxed environment**. Your images are processed directly within memory, stripped of metadata in milliseconds, and ready to download.
+        </p>
+
+        <div class="p-5 rounded-2xl bg-neutral-100/50 border border-neutral-200 dark:bg-neutral-900/35 dark:border-neutral-800 space-y-2">
+          <h3 class="font-bold text-neutral-900 dark:text-neutral-100 text-sm">Our Privacy Commitments:</h3>
+          <ul class="list-disc pl-5 space-y-1.5 text-xs sm:text-sm text-neutral-550 dark:text-neutral-400">
+            <li><strong>No File Uploads:</strong> Files never touch a server.</li>
+            <li><strong>No Account Required:</strong> Absolute anonymity.</li>
+            <li><strong>No Tracking:</strong> We only log anonymous layout analytics.</li>
+            <li><strong>No Adware:</strong> Clean, non-intrusive ad placements.</li>
+          </ul>
+        </div>
+
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-150 mt-8">Surgical, Lossless Binary Slicing</h2>
+        <p>
+          Unlike basic tools that redraw your photos to a canvas element (which compresses and degrades pixel quality), we manipulate the raw file bytes directly. We parse the container layout (JPEG APP segments, PNG chunks, WebP RIFF blocks), skip the metadata regions, and write the remaining image stream. Your file size shrinks slightly due to stripped tags, but the quality remains completely identical to your original image.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

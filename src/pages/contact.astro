@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = "Contact Us - EXIF Metadata Stripper";
+const description = "Get in touch with the EXIF Metadata Stripper team for support, feature requests, or privacy inquiries.";
+---
+
+<Layout title={title} description={description}>
+  <div class="mx-auto max-w-xl px-4 py-16 sm:px-6">
+    <div class="space-y-8">
+      <div class="space-y-4 text-center">
+        <h1 class="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-4xl">
+          Contact Us
+        </h1>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+          Have questions, feedback, or feature suggestions? Send us a message.
+        </p>
+      </div>
+
+      <!-- Contact Form -->
+      <form 
+        class="space-y-5 p-6 sm:p-8 rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 shadow-xs"
+        id="contact-form"
+      >
+        <div class="space-y-1">
+          <label for="name" class="text-xs font-semibold text-neutral-500 uppercase tracking-wider block">Name</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            required
+            class="w-full px-3.5 py-2 text-sm rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 text-neutral-850 dark:text-neutral-100 focus:outline-hidden focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white transition-all"
+            placeholder="John Doe"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label for="email" class="text-xs font-semibold text-neutral-500 uppercase tracking-wider block">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required
+            class="w-full px-3.5 py-2 text-sm rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 text-neutral-850 dark:text-neutral-100 focus:outline-hidden focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white transition-all"
+            placeholder="john@example.com"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label for="message" class="text-xs font-semibold text-neutral-500 uppercase tracking-wider block">Message</label>
+          <textarea 
+            id="message" 
+            name="message" 
+            rows="5"
+            required
+            class="w-full px-3.5 py-2 text-sm rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 text-neutral-850 dark:text-neutral-100 focus:outline-hidden focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white transition-all resize-y"
+            placeholder="How can we help you?"
+          ></textarea>
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-2 px-4 text-sm font-semibold rounded-lg text-white bg-neutral-900 hover:bg-neutral-850 dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 transition-colors shadow-xs"
+        >
+          Send Message
+        </button>
+
+        <div id="form-status" class="hidden text-xs text-center font-medium p-2.5 rounded-lg"></div>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const statusDiv = document.getElementById('form-status');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (statusDiv) {
+      statusDiv.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700', 'dark:bg-red-950/30', 'dark:text-red-400', 'dark:bg-green-950/30', 'dark:text-green-400');
+      statusDiv.classList.add('block', 'bg-green-50', 'text-green-700', 'dark:bg-green-950/30', 'dark:text-green-400');
+      statusDiv.textContent = "Thank you! Your message was sent successfully (this is a static demo form).";
+    }
+    form.reset();
+  });
+</script>
