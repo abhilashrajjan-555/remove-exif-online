@@ -84,6 +84,15 @@ const siteName = "EXIF Metadata Stripper";
       gtag('config', 'G-XXXXXXXXXX');
     </script>
     -->
+    <!-- Google AdSense -->
+    {import.meta.env.PUBLIC_ADSENSE_CLIENT && (
+      <script 
+        is:inline
+        async 
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT}`} 
+        crossorigin="anonymous"
+      ></script>
+    )}
   </head>
   <body class="bg-neutral-50 text-neutral-900 transition-colors duration-200 dark:bg-neutral-950 dark:text-neutral-50 font-['Inter',sans-serif] min-h-screen flex flex-col">
     <!-- Header/Navigation -->
